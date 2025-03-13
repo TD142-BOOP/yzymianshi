@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="hotkey-client-0.0.4-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/springboot-init-master/lib/hotkey-client-0.0.4-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
