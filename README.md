@@ -22,8 +22,6 @@ Nacos: 作为配置中心，支持动态配置管理。
 
 Sa-Token: 轻量级权限管理框架，用于用户认证和授权。
 
-COS (对象存储): 用于文件存储和管理。
-
 Hotkey: 用于热 key 探测和缓存管理。
 
 配置文件说明
@@ -78,3 +76,43 @@ Sa-Token 配置:
 AI 配置:
 
 配置了 AI 服务的 API Key。
+
+
+tudoumianshi/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── tudou/
+│   │   │           └── tudoumianshi/
+│   │   │               ├── controller/        # 控制器层
+│   │   │               ├── service/           # 服务层
+│   │   │               ├── dao/               # 数据访问层
+│   │   │               ├── entity/            # 实体类
+│   │   │               ├── config/            # 配置类
+│   │   │               └── Application.java   # 启动类
+│   │   └── resources/
+│   │       ├── application.yml                # 主配置文件
+│   │       └── static/                        # 静态资源
+│   └── test/                                  # 测试代码
+└── pom.xml                                    # Maven 配置文件
+
+
+依赖管理
+项目的依赖管理通过 Maven 进行，主要依赖包括：
+
+Spring Boot Starter
+
+Druid
+
+MyBatis-Plus
+
+Redis
+
+Elasticsearch
+
+Knife4j
+
+Nacos
+
+Sa-Token
