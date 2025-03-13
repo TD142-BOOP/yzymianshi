@@ -1,4 +1,4 @@
-项目概述
+**项目概述**
 TudouMianshi 是一个基于 Spring Boot 构建的 Java 后端项目，集成了多种常用的技术栈，包括数据库连接池、Redis、Elasticsearch、MyBatis-Plus、Swagger、Nacos 配置中心、Sa-Token 权限管理等。项目旨在提供一个高效、可扩展的后端服务，支持快速开发和部署。
 
 技术栈
@@ -79,26 +79,43 @@ AI 配置:
 
 
 tudoumianshi/
+
 ├── src/
+
 │   ├── main/
+
 │   │   ├── java/
+
 │   │   │   └── com/
+
 │   │   │       └── tudou/
+
 │   │   │           └── tudoumianshi/
+
 │   │   │               ├── controller/        # 控制器层
+
 │   │   │               ├── service/           # 服务层
+
 │   │   │               ├── dao/               # 数据访问层
+
 │   │   │               ├── entity/            # 实体类
+
 │   │   │               ├── config/            # 配置类
+
 │   │   │               └── Application.java   # 启动类
+
 │   │   └── resources/
+
 │   │       ├── application.yml                # 主配置文件
+
 │   │       └── static/                        # 静态资源
+
 │   └── test/                                  # 测试代码
+
 └── pom.xml                                    # Maven 配置文件
 
 
-依赖管理
+**依赖管理**
 项目的依赖管理通过 Maven 进行，主要依赖包括：
 
 Spring Boot Starter
