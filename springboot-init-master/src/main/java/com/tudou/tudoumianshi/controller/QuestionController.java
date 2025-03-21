@@ -9,7 +9,6 @@ import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.tudou.tudoumianshi.annotation.LimitCheck;
 import com.tudou.tudoumianshi.common.BaseResponse;
 import com.tudou.tudoumianshi.common.DeleteRequest;
@@ -23,7 +22,6 @@ import com.tudou.tudoumianshi.model.dto.question.*;
 import com.tudou.tudoumianshi.model.entity.Question;
 import com.tudou.tudoumianshi.model.entity.User;
 import com.tudou.tudoumianshi.model.vo.QuestionVO;
-import com.tudou.tudoumianshi.service.QuestionBankQuestionService;
 import com.tudou.tudoumianshi.service.QuestionService;
 import com.tudou.tudoumianshi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +50,6 @@ public class QuestionController {
     @Resource
     private QuestionService questionService;
 
-    @Resource
-    private QuestionBankQuestionService questionBankQuestionService;
 
     @Resource
     private CounterManager counterManager;
@@ -171,21 +167,21 @@ public class QuestionController {
      */
     @GetMapping("/get/vo")
     @LimitCheck
-    public BaseResponse<QuestionVO> getQuestionVOById( long id, HttpServletRequest request) {
+    public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
 //        User loginUser = userService.getLoginUserPermitNull(request);
 //        crawlerDetect(loginUser.getId());
         // 检测爬虫
         // 查询数据库
         Question question = questionService.getById(id);
-        String key="question_detail_" + id;
-        if (JdHotKeyStore.isHotKey(key)) {
-            //注意是get，不是getValue。getValue会获取并上报，get是纯粹的本地获取
-            Object cachedQuestionVO = JdHotKeyStore.get(key);
-            if(cachedQuestionVO != null) {
-                return ResultUtils.success((QuestionVO) cachedQuestionVO);
-            }
-        }
+        //String key="question_detail_" + id;
+//        if (JdHotKeyStore.isHotKey(key)) {
+//            //注意是get，不是getValue。getValue会获取并上报，get是纯粹的本地获取
+//            Object cachedQuestionVO = JdHotKeyStore.get(key);
+//            if(cachedQuestionVO != null) {
+//                return ResultUtils.success((QuestionVO) cachedQuestionVO);
+//            }
+//        }
         ThrowUtils.throwIf(question == null, ErrorCode.NOT_FOUND_ERROR);
         //JdHotKeyStore.smartSet(key,question);
         // 获取封装类

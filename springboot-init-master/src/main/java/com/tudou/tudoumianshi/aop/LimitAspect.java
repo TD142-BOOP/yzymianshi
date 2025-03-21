@@ -39,11 +39,11 @@ public class LimitAspect {
     //    public void controllerMethods() {
     //    }
     @Before("@annotation(limitCheck)")
-    public void aroundMethod(LimitCheck limitCheck){
+    public void beforeMethod(LimitCheck limitCheck){
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 显式获取当前登录用户
-        User loginUser = userService.getLoginUserPermitNull(request);
+        User loginUser = userService.getLoginUser(request);
         if (loginUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
@@ -86,7 +86,7 @@ public class LimitAspect {
         // 是否告警
         if (count == WARN_COUNT) {
             // 可以改为向管理员发送邮件通知
-            throw new BusinessException(110, "警告访问太频繁");
+            throw new BusinessException(110, "访问太频繁，请稍后再试");
         }
     }
 

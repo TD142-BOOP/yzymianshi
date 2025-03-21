@@ -1,6 +1,6 @@
 package com.tudou.tudoumianshi.manager;
+
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
@@ -8,11 +8,12 @@ import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.IntegerCodec;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.*;
 @Slf4j
 @Service
@@ -49,26 +50,19 @@ public class CounterManager {
 
 
     private final Cache<String, Integer> counterCache = Caffeine.newBuilder()
-            .expireAfterWrite(1, TimeUnit.MINUTES)
+            .expireAfterWrite(60, TimeUnit.SECONDS)
             .build();
-
-    // 定时任务执行间隔（毫秒），这里设置为 2 秒
-    private static final long INTERVAL = 2 * 1000;
 
     /**
      * 增加并返回计数，默认统计一分钟内的计数结果
      * @param key 缓存键
      * @return
      */
-    @SentinelResource(value = "incrAndGetCounter", blockHandler = "handleBlock")
+
     public long incrAndGetCounter(String key) {
         return incrAndGetCounter(key, 1, TimeUnit.MINUTES);
     }
-//    public long handleBlock() {
-//        requestCounter.increment();
-//        // 降级处理逻辑
-//        return requestCounter.longValue();
-//    }
+
 
     /**
      * 增加并返回计数
@@ -130,7 +124,12 @@ public class CounterManager {
         String redisKey = key + ":" + timeFactor;
 
         // 更新本地缓存中的计数
-        counterCache.asMap().compute(redisKey, (k, v) -> v == null ? 1 : v + 1);
+        long count = counterCache.asMap().compute(redisKey, (k, v) -> v == null ? 1 : v + 1);
+
+        if(count==10){
+            return count;
+        }
+
 
         // 返回本地缓存中的计数值
         return redissonClient.getAtomicLong(redisKey).get();

@@ -1,10 +1,10 @@
 package com.tudou.tudoumianshi.controller;
+
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.tudou.tudoumianshi.annotation.HotKeyValid;
 import com.tudou.tudoumianshi.common.BaseResponse;
 import com.tudou.tudoumianshi.common.DeleteRequest;
@@ -14,6 +14,7 @@ import com.tudou.tudoumianshi.constant.UserConstant;
 import com.tudou.tudoumianshi.exception.BusinessException;
 import com.tudou.tudoumianshi.exception.ThrowUtils;
 import com.tudou.tudoumianshi.model.dto.question.QuestionQueryRequest;
+import com.tudou.tudoumianshi.model.dto.questionBank.QuestionBankAddRequest;
 import com.tudou.tudoumianshi.model.dto.questionBank.QuestionBankEditRequest;
 import com.tudou.tudoumianshi.model.dto.questionBank.QuestionBankQueryRequest;
 import com.tudou.tudoumianshi.model.entity.Question;
@@ -27,6 +28,7 @@ import com.tudou.tudoumianshi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -61,7 +63,7 @@ public class QuestionBankController {
      */
     @PostMapping("/add")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
-    public BaseResponse<Long> addQuestionBank(@RequestBody com.tudou.tudoumianshi.model.dto.questionBank.QuestionBankAddRequest questionBankAddRequest, HttpServletRequest request) {
+    public BaseResponse<Long> addQuestionBank(@RequestBody QuestionBankAddRequest questionBankAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankAddRequest == null, ErrorCode.PARAMS_ERROR);
         // todo 在此处将实体类和 DTO 进行转换
         QuestionBank questionBank = new QuestionBank();
@@ -165,7 +167,7 @@ public class QuestionBankController {
             questionBankVO.setQuestionPage(questionVOPage);
         }
         // 设置本地缓存
-        JdHotKeyStore.smartSet(key, questionBankVO);
+        //JdHotKeyStore.smartSet(key, questionBankVO);
         // 获取封装类
         return ResultUtils.success(questionBankVO);
     }
