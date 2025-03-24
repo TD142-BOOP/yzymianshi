@@ -5,7 +5,6 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.tudou.tudoumianshi.annotation.HotKeyValid;
 import com.tudou.tudoumianshi.common.BaseResponse;
 import com.tudou.tudoumianshi.common.DeleteRequest;
 import com.tudou.tudoumianshi.common.ErrorCode;
@@ -143,14 +142,14 @@ public class QuestionBankController {
      * @return
      */
     @GetMapping("/get/vo")
-    @HotKeyValid
+    //@HotKeyValid
     public BaseResponse<QuestionBankVO> getQuestionBankVOById(QuestionBankQueryRequest questionBankQueryRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankQueryRequest==null, ErrorCode.PARAMS_ERROR);
         Long id = questionBankQueryRequest.getId();
         ThrowUtils.throwIf(id==null||id<=0, ErrorCode.PARAMS_ERROR);
         QuestionBank questionBank = questionBankService.getById(id);
 //        //TODO
-        String key="bank_detail_" + id;
+//        String key="bank_detail_" + id;
 //        QuestionBankVO result=(QuestionBankVO) JdHotKeyStore.get(key);
 //        if (result!= null) {
 //            return ResultUtils.success(result);

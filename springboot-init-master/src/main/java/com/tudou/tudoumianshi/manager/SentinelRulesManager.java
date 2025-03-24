@@ -1,5 +1,4 @@
 package com.tudou.tudoumianshi.manager;
-
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
 import com.alibaba.csp.sentinel.slots.block.degrade.circuitbreaker.CircuitBreakerStrategy;
@@ -17,6 +16,7 @@ public class SentinelRulesManager {
     @PostConstruct
     public void initRules() {
         initFlowRules();
+        initFlowRule();
         initDegradeRules();
     }
 
@@ -26,6 +26,15 @@ public class SentinelRulesManager {
         ParamFlowRule rule = new ParamFlowRule("listQuestionVOByPage")
                 .setParamIdx(0) // 对第 0 个参数限流，即 IP 地址
                 .setCount(60) // 每分钟最多 60 次
+                .setDurationInSec(60); // 规则的统计周期为 60 秒
+        ParamFlowRuleManager.loadRules(Collections.singletonList(rule));
+    }
+
+    public void initFlowRule() {
+        // 单 IP 查看题目列表限流规则
+        ParamFlowRule rule = new ParamFlowRule("getQuestionVOById")
+                .setParamIdx(0) // 对第 0 个参数限流，即 IP 地址
+                .setCount(10) // 每分钟最多 60 次
                 .setDurationInSec(60); // 规则的统计周期为 60 秒
         ParamFlowRuleManager.loadRules(Collections.singletonList(rule));
     }

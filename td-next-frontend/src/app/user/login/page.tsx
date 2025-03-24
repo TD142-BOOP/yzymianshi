@@ -45,7 +45,7 @@ const UserLoginPage: React.FC = () => {
       <LoginForm
         form={form}
         logo={
-          <Image src="/assets/OIP-C.ioc" alt="土豆面试" height={44} width={44} />
+          <Image src="/assets/nyxjtqqfpx1.jpg" alt="土豆面试" height={44} width={44} />
         }
         title="土豆面试"
         subTitle="程序员面试刷题网站"

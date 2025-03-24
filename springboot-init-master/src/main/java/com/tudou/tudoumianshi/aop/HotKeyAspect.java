@@ -1,21 +1,21 @@
 package com.tudou.tudoumianshi.aop;
 
 import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
-
 import com.tudou.tudoumianshi.common.ErrorCode;
 import com.tudou.tudoumianshi.common.ResultUtils;
 import com.tudou.tudoumianshi.exception.ThrowUtils;
-
 import com.tudou.tudoumianshi.model.dto.questionBank.QuestionBankQueryRequest;
-
 import com.tudou.tudoumianshi.model.vo.QuestionBankVO;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;;
-import org.springframework.stereotype.Component;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Pointcut;
+
 import javax.servlet.http.HttpServletRequest;
 
-@Aspect
-@Component
+;
+
+//@Aspect
+//@Component
 public class HotKeyAspect {
 
 
