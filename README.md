@@ -133,3 +133,11 @@ Knife4j
 Nacos
 
 Sa-Token
+
+
+**拓展**
+爬虫用户ip更新到nacos配置由手动更新变为自动更新
+
+用HotKey和Sentinel统计用户访问接口次数，达到配置的阈值将用户ip更新到nacos配置
+
+用注解的方式实现反爬虫，热点key检测的功能
