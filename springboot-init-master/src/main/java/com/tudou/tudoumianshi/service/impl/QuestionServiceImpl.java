@@ -314,7 +314,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
                     } else {
                         // 从 es 清空 db 已物理删除的数据
                         String delete = elasticsearchRestTemplate.delete(String.valueOf(postId), QuestionEsDTO.class);
-                        log.info("delete post {}", delete);
+                        log.info("delete question {}", delete);
                     }
                 });
             }
