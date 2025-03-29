@@ -1,4 +1,5 @@
 **项目概述**
+
 TudouMianshi 是一个基于 Spring Boot 构建的 Java 后端项目，集成了多种常用的技术栈，包括数据库连接池、Redis、Elasticsearch、MyBatis-Plus、Swagger、Nacos 配置中心、Sa-Token 权限管理等。项目旨在提供一个高效、可扩展的后端服务，支持快速开发和部署。
 
 技术栈
@@ -116,6 +117,7 @@ tudoumianshi/
 
 
 **依赖管理**
+
 项目的依赖管理通过 Maven 进行，主要依赖包括：
 
 Spring Boot Starter
@@ -133,3 +135,12 @@ Knife4j
 Nacos
 
 Sa-Token
+
+
+**拓展**
+
+爬虫用户ip更新到nacos配置由手动更新变为自动更新
+
+用HotKey和Sentinel统计用户访问接口次数，达到配置的阈值将用户ip更新到nacos配置
+
+用注解的方式实现反爬虫，热点key检测的功能
