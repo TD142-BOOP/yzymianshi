@@ -36,7 +36,7 @@ const UpdateBankModal: React.FC<Props> = (props) => {
       console.log(list);
       form.setFieldValue("questionBankIdList" as any, list);
     } catch (e) {
-      message.error("获取题目所属题库列表失败，" + e.message);
+      console.error("获取题目所属题库列表失败，" + e.message);
     }
   };
 
@@ -44,7 +44,7 @@ const UpdateBankModal: React.FC<Props> = (props) => {
     if (questionId) {
       getCurrentQuestionBankIdList();
     }
-  }, [questionId]);
+  }, [questionId,getCurrentQuestionBankIdList()]);
 
   // 获取题库列表
   const getQuestionBankList = async () => {
@@ -59,13 +59,13 @@ const UpdateBankModal: React.FC<Props> = (props) => {
       });
       setQuestionBankList(res.data?.records ?? []);
     } catch (e) {
-      message.error("获取题库列表失败，" + e.message);
+      console.error("获取题库列表失败，" + e.message);
     }
   };
 
   useEffect(() => {
     getQuestionBankList();
-  }, []);
+  }, [getQuestionBankList]);
 
   return (
     <Modal

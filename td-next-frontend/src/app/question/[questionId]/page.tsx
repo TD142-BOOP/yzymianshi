@@ -25,7 +25,7 @@ export default function QuestionPage({ params }) {
           setQuestion(res.data);
         })
         .catch((e) => {
-          message.error("获取题目详情失败，" + e.message);
+          console.error("获取题目详情失败，" + e.message);
           setError("获取题目详情失败，请稍后重试。");
         })
         .finally(() => {

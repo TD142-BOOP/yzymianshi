@@ -40,7 +40,7 @@ const UserRegisterPage: React.FC = () => {
       <LoginForm
         form={form}
         logo={
-          <Image src="/assets/nyxjtqqfpx1.jpg" alt="土豆面试" height={44} width={44} />
+          <Image src="/assets/OIP-C.jpg" alt="土豆面试" height={44} width={44} />
         }
         title="土豆面试 - 用户注册"
         subTitle="程序员面试刷题网站"

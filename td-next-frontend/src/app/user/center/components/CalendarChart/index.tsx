@@ -35,7 +35,7 @@ const CalendarChart = (props: Props) => {
   // 保证只会调用一次
   useEffect(() => {
     fetchDataList();
-  }, []);
+  }, [fetchDataList]);
 
   // 计算图表所需的数据
   const optionsData = dataList.map((dayOfYear) => {

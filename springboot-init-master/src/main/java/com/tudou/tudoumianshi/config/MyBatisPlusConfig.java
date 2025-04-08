@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * MyBatis Plus 配置
- *
- * @author https://github.com/litudou
+ * MyBatis Plus 配置类
  */
 @Configuration
 @MapperScan("com.tudou.tudoumianshi.mapper")

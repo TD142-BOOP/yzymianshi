@@ -1,15 +1,18 @@
 package com.tudou.tudoumianshi.model.enums;
 
+import lombok.Getter;
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * 用户角色枚举
  *
 
  */
+@Getter
 public enum UserRoleEnum {
 
     USER("用户", "user"),
@@ -52,11 +55,4 @@ public enum UserRoleEnum {
         return null;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public String getText() {
-        return text;
-    }
 }

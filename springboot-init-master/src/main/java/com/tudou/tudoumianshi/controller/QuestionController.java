@@ -6,12 +6,8 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
-import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeException;
-import com.alibaba.nacos.api.NacosFactory;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.exception.NacosException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tudou.tudoumianshi.common.BaseResponse;
 import com.tudou.tudoumianshi.common.DeleteRequest;
@@ -27,7 +23,6 @@ import com.tudou.tudoumianshi.model.entity.User;
 import com.tudou.tudoumianshi.model.vo.QuestionVO;
 import com.tudou.tudoumianshi.service.QuestionService;
 import com.tudou.tudoumianshi.service.UserService;
-import com.tudou.tudoumianshi.utils.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -38,16 +33,12 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 
 /**
@@ -172,66 +163,66 @@ public class QuestionController {
     }
 
 
-    @Value("${nacos.config.data-id}")
-    private String dataId;
+//    @Value("${nacos.config.data-id}")
+//    private String dataId;
+//
+//    @Value("${nacos.config.server-addr}")
+//    private String serverAddr;
+//
+//    @Value("${nacos.config.group}")
+//    private String group;
+//    private void updateNacosBlackList(String ip){
+//        Properties properties = new Properties();
+//        properties.put("serverAddr", serverAddr);
+//
+//        try {
+//            // 创建ConfigService
+//            ConfigService configService = NacosFactory.createConfigService(properties);
+//
+//            // 从Nacos获取配置
+//            String content = configService.getConfig(dataId, group, 5000);
+//            System.out.println("获取到的YAML配置内容: " + content);
+//
+//            // 解析YAML
+//            Yaml yaml = new Yaml();
+//            Map<String, Object> yamlMap = yaml.load(content);
+//
+//            // 获取黑名单IP列表
+//            List<String> blacklist = (List<String>) yamlMap.get("blackIpList");
+//            // 添加新的IP到黑名单
+//            if (!blacklist.contains(ip)) {
+//                blacklist.add(ip);
+//                System.out.println("添加新的IP到黑名单: " + ip);
+//            }
+//
+//            // 将更新后的YAML内容发布到Nacos
+//            String updatedContent = yaml.dump(yamlMap);
+//            boolean isPublishOk = configService.publishConfig(dataId, group, updatedContent);
+//            if (isPublishOk) {
+//                System.out.println("配置更新成功");
+//            } else {
+//                System.out.println("配置更新失败");
+//            }
+//        } catch (NacosException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    @Value("${nacos.config.server-addr}")
-    private String serverAddr;
 
-    @Value("${nacos.config.group}")
-    private String group;
-    private void updateNacosBlackList(String ip){
-        Properties properties = new Properties();
-        properties.put("serverAddr", serverAddr);
-
-        try {
-            // 创建ConfigService
-            ConfigService configService = NacosFactory.createConfigService(properties);
-
-            // 从Nacos获取配置
-            String content = configService.getConfig(dataId, group, 5000);
-            System.out.println("获取到的YAML配置内容: " + content);
-
-            // 解析YAML
-            Yaml yaml = new Yaml();
-            Map<String, Object> yamlMap = yaml.load(content);
-
-            // 获取黑名单IP列表
-            List<String> blacklist = (List<String>) yamlMap.get("blackIpList");
-            // 添加新的IP到黑名单
-            if (!blacklist.contains(ip)) {
-                blacklist.add(ip);
-                System.out.println("添加新的IP到黑名单: " + ip);
-            }
-
-            // 将更新后的YAML内容发布到Nacos
-            String updatedContent = yaml.dump(yamlMap);
-            boolean isPublishOk = configService.publishConfig(dataId, group, updatedContent);
-            if (isPublishOk) {
-                System.out.println("配置更新成功");
-            } else {
-                System.out.println("配置更新失败");
-            }
-        } catch (NacosException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * getQuestionVOById
-     * 监控用户访问接口频率，发现爬虫用户直接封号
-     */
-    public BaseResponse<QuestionVO> handleBlockException(long id, HttpServletRequest request, BlockException ex) {
-        User loginUser = userService.getLoginUser(request);
-        String ip = IpUtils.getClientIp(request);
-        // 踢下线
-        StpUtil.kickout(loginUser.getId());
-        // ip更新到nacos
-        updateNacosBlackList(ip);
-        // 限流操作
-        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "访问太频繁，已封号");
-    }
+//    /**
+//     * getQuestionVOById
+//     * 监控用户访问接口频率，发现爬虫用户直接封号
+//     */
+//    public BaseResponse<QuestionVO> handleBlockException(long id, HttpServletRequest request, BlockException ex) {
+//        User loginUser = userService.getLoginUser(request);
+//        String ip = IpUtils.getClientIp(request);
+//        // 踢下线
+//        StpUtil.kickout(loginUser.getId());
+//        // ip更新到nacos
+//        updateNacosBlackList(ip);
+//        // 限流操作
+//        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "访问太频繁，已封号");
+//    }
     /**
      * 根据 id 获取题目（封装类）
      *
@@ -240,12 +231,12 @@ public class QuestionController {
      */
     @GetMapping("/get/vo")
     //@LimitCheck
-    @SentinelResource(value = "getQuestionVOById",
-            blockHandler = "handleBlockException")
+//    @SentinelResource(value = "getQuestionVOById",
+//            blockHandler = "handleBlockException")
     public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
-//        User loginUser = userService.getLoginUserPermitNull(request);
-//        crawlerDetect(loginUser.getId());
+        User loginUser = userService.getLoginUserPermitNull(request);
+        crawlerDetect(loginUser.getId());
         // 检测爬虫
         // 查询数据库
         Question question = questionService.getById(id);

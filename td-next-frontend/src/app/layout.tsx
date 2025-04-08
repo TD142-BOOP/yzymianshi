@@ -33,7 +33,7 @@ const InitLayout: React.FC<
   // 只执行一次
   useEffect(() => {
     doInitLoginUser();
-  }, []);
+  }, );
   return children;
 };
 

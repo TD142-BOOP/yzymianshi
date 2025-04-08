@@ -6,14 +6,14 @@ spring:
   # todo 需替换配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/tudouda
+    url: jdbc:mysql://8.138.107.13:3306/tudouda
     username: tudouda_user
     password: 123456
   # Redis 配置
   # todo 需替换配置
   redis:
     database: 3
-    host: 106.55.187.187
+    host: 8.138.107.13
     port: 6379
     timeout: 5000
     password: 123456
@@ -49,3 +49,5 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: true
+ai:
+  apiKey: a4eb4678-bafb-46cb-bde7-7e03f263af64

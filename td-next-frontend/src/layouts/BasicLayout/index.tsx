@@ -63,7 +63,7 @@ export default function BasicLayout({ children }: Props) {
         layout="top"
         logo={
           <Image
-            src="/assets/nyxjtqqfpx1.jpg"
+            src="/assets/OIP-C.jpg"
             height={32}
             width={32}
             alt="土豆面试"
@@ -88,7 +88,7 @@ export default function BasicLayout({ children }: Props) {
           srcSet: "",
           style: undefined,
           valueOf: undefined,
-          src: loginUser.userAvatar || "/assets/nyxjtqqfpx1.jpg",
+          src: loginUser.userAvatar || "/assets/OIP-C.jpg",
           size: "small",
           title: loginUser.userName || "土豆",
           render: (props, dom) => {

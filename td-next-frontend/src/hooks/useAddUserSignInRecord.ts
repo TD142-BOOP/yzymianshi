@@ -17,7 +17,7 @@ const useAddUserSignInRecord = () => {
     try {
       await addUserSignInUsingPost({});
     } catch (e) {
-      message.error("获取刷题签到记录失败，" + e.message);
+      console.error("获取刷题签到记录失败，" + e.message);
     }
     setLoading(false);
   };

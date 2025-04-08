@@ -98,75 +98,75 @@ export default function InterviewRoomPage({ params }) {
   };
 
   return (
-    <div id="interviewRoomPage" className="max-width-content">
-      {/* 标题 */}
-      <div className="header">
-        <h1>模拟面试 #{interview?.id}</h1>
-        <Tag color={isEnded ? "red" : isStarted ? "green" : "orange"}>
-          {isEnded ? "已结束" : isStarted ? "进行中" : "待开始"}
-        </Tag>
-      </div>
+      <div id="interviewRoomPage" className="max-width-content">
+        {/* 标题 */}
+        <div className="header">
+          <h1>模拟面试 #{interview?.id}</h1>
+          <Tag color={isEnded ? "red" : isStarted ? "green" : "orange"}>
+            {isEnded ? "已结束" : isStarted ? "进行中" : "待开始"}
+          </Tag>
+        </div>
 
-      {/* 操作按钮 */}
-      <div className="action-buttons">
-        <Button
-          type="primary"
-          onClick={() => handleEvent("start")}
-          disabled={isStarted || isEnded}
-          loading={loading}
-        >
-          开始面试
-        </Button>
-        <Button
-          danger
-          onClick={() => handleEvent("end")}
-          disabled={!isStarted || isEnded}
-          loading={loading}
-        >
-          结束面试
-        </Button>
-      </div>
+        {/* 操作按钮 */}
+        <div className="action-buttons">
+          <Button
+              type="primary"
+              onClick={() => handleEvent("start")}
+              disabled={isStarted || isEnded}
+              loading={loading}
+          >
+            开始面试
+          </Button>
+          <Button
+              danger
+              onClick={() => handleEvent("end")}
+              disabled={!isStarted || isEnded}
+              loading={loading}
+          >
+            结束面试
+          </Button>
+        </div>
 
-      {/* 消息列表 */}
-      <Card className="message-area">
-        <List
-          dataSource={messages}
-          split={false}
-          renderItem={(item) => (
-            <List.Item
-              style={{
-                justifyContent: item.isAI ? "flex-start" : "flex-end",
-              }}
-            >
-              <div className={`message-bubble ${item.isAI ? "ai" : "user"}`}>
-                <div className="message-content">{item.content}</div>
-                <div className="message-time">
-                  {new Date(item.timestamp).toLocaleTimeString()}
-                </div>
-              </div>
-            </List.Item>
-          )}
-        />
-      </Card>
+        {/* 消息列表 */}
+        <Card className="message-area">
+          <List
+              dataSource={messages}
+              split={false}
+              renderItem={(item) => (
+                  <List.Item
+                      style={{
+                        justifyContent: item.isAI ? "flex-start" : "flex-end",
+                      }}
+                  >
+                    <div className={`message-bubble ${item.isAI ? "ai" : "user"}`}>
+                      <div className="message-content">{item.content}</div>
+                      <div className="message-time">
+                        {new Date(item.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </List.Item>
+              )}
+          />
+        </Card>
 
-      {/* 输入区域 */}
-      <div className="input-area">
-        <Input.TextArea
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="输入你的回答..."
-          disabled={!isStarted || isEnded}
-          rows={3}
-        />
-        <Button
-          type="primary"
-          onClick={sendMessage}
-          loading={loading}
-          disabled={!isStarted || isEnded}
-        >
-          发送
-        </Button>
+        {/* 输入区域 */}
+        <div className="input-area">
+          <Input.TextArea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="输入你的回答..."
+              disabled={!isStarted || isEnded}
+              rows={3}
+          />
+          <Button
+              type="primary"
+              onClick={sendMessage}
+              loading={loading}
+              disabled={!isStarted || isEnded}
+          >
+            发送
+          </Button>
+        </div>
       </div>
-    </div>
   );
 }

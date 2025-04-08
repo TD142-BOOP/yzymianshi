@@ -112,10 +112,6 @@
             <artifactId>sa-token-spring-boot-starter</artifactId>
             <version>1.39.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-        </dependency>
         <!--  Nacos 配置中心  -->
         <dependency>
             <groupId>com.alibaba.boot</groupId>
