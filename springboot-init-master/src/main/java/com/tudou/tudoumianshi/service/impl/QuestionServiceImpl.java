@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tudou.tudoumianshi.common.ErrorCode;
 import com.tudou.tudoumianshi.constant.CommonConstant;
+import com.tudou.tudoumianshi.constant.ThumbConstant;
 import com.tudou.tudoumianshi.exception.BusinessException;
 import com.tudou.tudoumianshi.exception.ThrowUtils;
 import com.tudou.tudoumianshi.manager.AiManager;
@@ -23,6 +24,7 @@ import com.tudou.tudoumianshi.model.vo.QuestionVO;
 import com.tudou.tudoumianshi.model.vo.UserVO;
 import com.tudou.tudoumianshi.service.QuestionBankQuestionService;
 import com.tudou.tudoumianshi.service.QuestionService;
+import com.tudou.tudoumianshi.service.ThumbService;
 import com.tudou.tudoumianshi.service.UserService;
 import com.tudou.tudoumianshi.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +35,17 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -54,6 +59,10 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> implements QuestionService {
+
+    @Lazy
+    @Resource
+    private ThumbService thumbService;
 
     @Resource
     private UserService userService;
@@ -145,7 +154,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
     public QuestionVO getQuestionVO(Question question, HttpServletRequest request) {
         // 对象转封装类
         QuestionVO questionVO = QuestionVO.objToVo(question);
-
+        User loginUser = userService.getLoginUser(request);
         // todo 可以根据需要为封装对象补充值，不需要的内容可以删除
         // region 可选
         // 1. 关联查询用户信息
@@ -155,6 +164,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
             user = userService.getById(userId);
         }
         UserVO userVO = userService.getUserVO(user);
+        Boolean exist = thumbService.hasThumb(question.getId(), loginUser.getId());
+        questionVO.setHasThumb(exist);
         questionVO.setUser(userVO);
         // endregion
 
@@ -202,36 +213,58 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         return questionVOPage;
     }
 
+    @Resource
+    private RedisTemplate redisTemplate;
     /**
      * 获取查询条件
+     *
      * @param questionQueryRequest
+     * @param request
      * @return
      */
     @Override
-    public Page<Question> listQuestionQueryByPage(QuestionQueryRequest questionQueryRequest) {
+    public Page<Question> listQuestionQueryByPage(QuestionQueryRequest questionQueryRequest, HttpServletRequest request) {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
+        User loginUser = userService.getLoginUser(request);
+        Map<Long, Boolean> questionIdHasThumbMap = new HashMap<>();
         // 题目表的查询条件
         QueryWrapper<Question> queryWrapper = this.getQueryWrapper(questionQueryRequest);
         // 根据题库查询题目列表接口
         Long questionBankId = questionQueryRequest.getQuestionBankId();
         if (questionBankId != null) {
+            List<Question> list = this.list();
             // 查询题库内的题目 id
             LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
                     .select(QuestionBankQuestion::getQuestionId)
                     .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
             List<QuestionBankQuestion> questionList = questionBankQuestionService.list(lambdaQueryWrapper);
             if (CollUtil.isNotEmpty(questionList)) {
+                List<Object> questionIdList = list.stream().map(question -> question.getId().toString()).collect(Collectors.toList());
                 // 取出题目 id 集合
                 Set<Long> questionIdSet = questionList.stream()
                         .map(QuestionBankQuestion::getQuestionId)
                         .collect(Collectors.toSet());
-                // 复用原有题目表的查询条件
+                // 获取点赞
+                List<Object> thumbList = redisTemplate.opsForHash().multiGet(ThumbConstant.USER_THUMB_KEY_PREFIX + loginUser.getId(), questionIdList);
+                for (int i = 0; i < thumbList.size(); i++) {
+                    if (thumbList.get(i) == null) {
+                        continue;
+                    }
+                    questionIdHasThumbMap.put(Long.valueOf(questionIdList.get(i).toString()), true);
+                }
+                    // 复用原有题目表的查询条件
                 queryWrapper.in("id", questionIdSet);
             } else {
                 // 题库为空，则返回空列表
                 return new Page<>(current, size, 0);
             }
+            list.stream()
+                    .map(question -> {
+                        QuestionVO questionVO = QuestionVO.objToVo(question);
+                        questionVO.setHasThumb(questionIdHasThumbMap.get(question.getId()));
+                        return questionVO;
+                    });
         }
         // 查询数据库
         Page<Question> questionPage = this.page(new Page<>(current, size), queryWrapper);
@@ -336,6 +369,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "删除失败");
     }
 
+
+
     @Resource
     private AiManager aiManager;
     @Override
@@ -355,7 +390,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         // 2. 拼接用户 Prompt
         String userPrompt = String.format("题目数量：%s, 题目方向：%s", questionNum, questionType);
         // 3. 调用 AI 生成题目
-        String answer = aiManager.doChat( userPrompt,systemPrompt);
+        String answer = aiManager.doChat(userPrompt,systemPrompt);
         // 4. 对题目进行预处理
         // 按行拆分
         List<String> lines = Arrays.asList(answer.split("\n"));

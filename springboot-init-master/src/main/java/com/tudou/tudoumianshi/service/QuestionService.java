@@ -55,10 +55,12 @@ public interface QuestionService extends IService<Question> {
 
     /**
      * 获取题目列表
+     *
      * @param questionQueryRequest
+     * @param request
      * @return
      */
-    Page<Question> listQuestionQueryByPage(QuestionQueryRequest questionQueryRequest);
+    Page<Question> listQuestionQueryByPage(QuestionQueryRequest questionQueryRequest, HttpServletRequest request);
 
     /**
      * 从 ES 查询题目

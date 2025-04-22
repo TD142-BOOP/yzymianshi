@@ -187,6 +187,13 @@ sa-token:
 ai:
   apiKey: a4eb4678-bafb-46cb-bde7-7e03f263af64
 
+# Pulsar配置
+pulsar:
+  service-url: pulsar://localhost:6650
+  io-threads: 1
+  listener-threads: 1
+  enable-tcp-no-delay: true
+
 
 
 

@@ -52,6 +52,14 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <!-- 引入 spring-pulsar -->
+        <dependency>
+            <groupId>org.apache.pulsar</groupId>
+            <artifactId>pulsar-client</artifactId>
+            <version>2.11.0</version> <!-- 支持 JDK 8 的最新稳定版 -->
+        </dependency>
+
+
         <!--  druid  -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -164,10 +172,10 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-test</artifactId>
+       <scope>test</scope>
+   </dependency>
     </dependencies>
     <build>
         <plugins>

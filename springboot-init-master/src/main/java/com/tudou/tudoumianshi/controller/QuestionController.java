@@ -236,6 +236,7 @@ public class QuestionController {
     public BaseResponse<QuestionVO> getQuestionVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUserPermitNull(request);
+        ThrowUtils.throwIf(loginUser==null,ErrorCode.NOT_LOGIN_ERROR);
         crawlerDetect(loginUser.getId());
         // 检测爬虫
         // 查询数据库
@@ -300,9 +301,9 @@ public class QuestionController {
      */
     @PostMapping("/list/page")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
+    public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest,HttpServletRequest request) {
         ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
-        Page<Question> questions = questionService.listQuestionQueryByPage(questionQueryRequest);
+        Page<Question> questions = questionService.listQuestionQueryByPage(questionQueryRequest,request);
         return ResultUtils.success(questions);
     }
 
@@ -321,7 +322,7 @@ public class QuestionController {
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
-        Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest);
+        Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest,request);
         // 获取封装类
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
@@ -347,7 +348,7 @@ public class QuestionController {
             entry = SphU.entry("listQuestionVOByPage", EntryType.IN, 1, remoteAddr);
             // 被保护的业务逻辑
             // 查询数据库
-            Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest);
+            Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest, request);
             // 获取封装类
             return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
         } catch (Throwable ex) {
@@ -493,7 +494,7 @@ public class QuestionController {
     private BaseResponse<Page<QuestionVO>> fallbackToMySQL(
             QuestionQueryRequest questionQueryRequest,
             HttpServletRequest request) {
-        Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest);
+        Page<Question> questionPage = questionService.listQuestionQueryByPage(questionQueryRequest, request);
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 

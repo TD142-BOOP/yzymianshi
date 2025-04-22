@@ -64,6 +64,16 @@ public class QuestionVO implements Serializable {
     private UserVO user;
 
     /**
+     * 点赞数
+     */
+    private Integer thumbCount;
+
+    /**
+     * 是否已点赞
+     */
+    private Boolean hasThumb;
+
+    /**
      * 封装类转对象
      *
      * @param questionVO

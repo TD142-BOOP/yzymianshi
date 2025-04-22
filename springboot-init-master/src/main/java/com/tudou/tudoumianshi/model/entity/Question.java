@@ -1,10 +1,10 @@
 package com.tudou.tudoumianshi.model.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 题目
@@ -18,6 +18,11 @@ public class Question implements Serializable {
      */
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+
+    /**
+     * 点赞数
+     */
+    private Integer thumbCount;
 
     /**
      * 标题
