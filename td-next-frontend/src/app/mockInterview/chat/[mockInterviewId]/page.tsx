@@ -79,7 +79,7 @@ export default function InterviewRoomPage({ params }) {
 
       // 更新状态
       if (eventType === "start") setIsStarted(true);
-      if (eventType === "chat" && res.data.includes("【面试结束】")) {
+      if (eventType === "chat" && res.data?.includes("【面试结束】")) {
         setIsEnded(true);
       }
       if (eventType === "end") setIsEnded(true);

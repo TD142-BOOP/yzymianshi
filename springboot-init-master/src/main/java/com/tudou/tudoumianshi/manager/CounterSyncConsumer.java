@@ -6,6 +6,7 @@ import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.IntegerCodec;
 import org.springframework.stereotype.Service;
+import org.apache.pulsar.client.api.PulsarClientException.AlreadyClosedException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -19,6 +20,7 @@ public class CounterSyncConsumer {
     private final PulsarClient pulsarClient;
     private final RedissonClient redissonClient;
     private Consumer<CounterEvent> consumer;
+    private volatile boolean running = true;
 
     public CounterSyncConsumer(PulsarClient pulsarClient, RedissonClient redissonClient) {
         this.pulsarClient = pulsarClient;
@@ -44,7 +46,7 @@ public class CounterSyncConsumer {
     }
 
     private void receiveMessages() {
-        while (true) {
+        while (running) {
             try {
                 Messages<CounterEvent> messages = consumer.batchReceive();
                 if (messages != null) {
@@ -60,6 +62,9 @@ public class CounterSyncConsumer {
                         }
                     }
                 }
+            } catch (AlreadyClosedException e) {
+                log.info("Pulsar Consumer 已关闭，退出接收循环");
+                break;
             } catch (Exception e) {
                 log.error("接收 CounterEvent 消息失败", e);
             }
@@ -90,6 +95,7 @@ public class CounterSyncConsumer {
 
     @PreDestroy
     public void close() {
+        running = false;
         if (consumer != null) {
             try {
                 consumer.close();

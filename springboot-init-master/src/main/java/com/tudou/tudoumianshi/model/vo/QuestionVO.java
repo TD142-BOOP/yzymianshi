@@ -1,7 +1,6 @@
 package com.tudou.tudoumianshi.model.vo;
 
 import cn.hutool.json.JSONUtil;
-
 import com.tudou.tudoumianshi.model.entity.Question;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -67,6 +66,8 @@ public class QuestionVO implements Serializable {
      * 点赞数
      */
     private Integer thumbCount;
+
+
 
     /**
      * 是否已点赞

@@ -451,7 +451,7 @@ declare namespace API {
     id?: number;
     isDelete?: number;
     tags?: string;
-    thumbNum?: number;
+    thumbCount?: number;
     title?: string;
     updateTime?: string;
     userId?: number;
@@ -518,7 +518,7 @@ declare namespace API {
     hasThumb?: boolean;
     id?: number;
     tagList?: string[];
-    thumbNum?: number;
+    thumbCount?: number;
     title?: string;
     updateTime?: string;
     user?: UserVO;

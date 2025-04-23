@@ -26,12 +26,8 @@ import com.tudou.tudoumianshi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -464,30 +460,30 @@ public class QuestionController {
             HttpServletRequest request) throws IOException {
 
         // 1. 参数校验（预防性降级）
-        long size = questionQueryRequest.getPageSize();
-        ThrowUtils.throwIf(size > 200, ErrorCode.PARAMS_ERROR);
-
-        try {
-            // 2. 检查 ES 健康状态（主动降级判断）
-            ElasticsearchHealthChecker("localhost", 9200);
-            ClusterHealthRequest healthRequest = new ClusterHealthRequest();
-            ClusterHealthResponse health = client.cluster().health(healthRequest, RequestOptions.DEFAULT);
-            ClusterHealthStatus status = health.getStatus();
-
-            if (status == ClusterHealthStatus.RED) { // 仅当 RED 状态才降级
-                log.warn("ES 集群不可用，降级到 MySQL");
-                return fallbackToMySQL(questionQueryRequest, request);
-            }
-
-            // 3. 尝试 ES 查询（带超时控制）
-            Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
-            return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
-
-        } catch (Exception e) {
+//        long size = questionQueryRequest.getPageSize();
+//        ThrowUtils.throwIf(size > 200, ErrorCode.PARAMS_ERROR);
+//
+//        try {
+//            // 2. 检查 ES 健康状态（主动降级判断）
+//            ElasticsearchHealthChecker("localhost", 9200);
+//            ClusterHealthRequest healthRequest = new ClusterHealthRequest();
+//            ClusterHealthResponse health = client.cluster().health(healthRequest, RequestOptions.DEFAULT);
+//            ClusterHealthStatus status = health.getStatus();
+//
+//            if (status == ClusterHealthStatus.RED) { // 仅当 RED 状态才降级
+//                log.warn("ES 集群不可用，降级到 MySQL");
+//                return fallbackToMySQL(questionQueryRequest, request);
+//            }
+//
+//            // 3. 尝试 ES 查询（带超时控制）
+//            Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
+//            return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+//
+//        } catch (Exception e) {
             // 4. 异常降级（如超时、连接失败）
-            log.error("ES 查询异常，降级到 MySQL", e);
+            //log.error("ES 查询异常，降级到 MySQL", e);
             return fallbackToMySQL(questionQueryRequest, request);
-        }
+//        }
     }
 
     // 降级方法

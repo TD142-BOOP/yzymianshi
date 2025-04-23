@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.pulsar.client.api.PulsarClientException.AlreadyClosedException;
+import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,8 @@ public class ThumbConsumer {
     private DeadLetterPolicy deadLetterPolicy;
 
     private Consumer<byte[]> consumer;
+    // 控制接收线程的运行状态
+    private volatile boolean running = true;
 
     @PostConstruct
     public void init() {
@@ -64,6 +69,8 @@ public class ThumbConsumer {
 
     @PreDestroy
     public void destroy() {
+        // 停止消息接收循环
+        running = false;
         try {
             if (consumer != null) {
                 consumer.close();
@@ -75,7 +82,7 @@ public class ThumbConsumer {
 
     private void receiveMessages() {
         try {
-            while (true) {
+            while (running) {
                 try {
                     // 批量接收消息
                     Messages<byte[]> messages = consumer.batchReceive();
@@ -93,6 +100,9 @@ public class ThumbConsumer {
                             }
                         }
                     }
+                } catch (AlreadyClosedException e) {
+                    log.info("Pulsar Consumer 已关闭，退出接收循环");
+                    break;
                 } catch (Exception e) {
                     log.error("处理消息失败", e);
                 }
@@ -136,33 +146,32 @@ public class ThumbConsumer {
             }
         }
 
-        // 按(userId, questionId)分组，并获取每个分组的最新事件
-        Map<Pair<Long, Long>, ThumbEvent> latestEvents = new HashMap<>();
-
-        for (ThumbEvent event : events) {
-            Pair<Long, Long> key = Pair.of(event.getUserId(), event.getQuestionId());
-            if (!latestEvents.containsKey(key) ||
-                event.getEventTime().isAfter(latestEvents.get(key).getEventTime())) {
-                latestEvents.put(key, event);
-            }
+        // 分组处理每个 (userId, questionId)，支持切换场景：先删除再插入
+        Map<Pair<Long, Long>, List<ThumbEvent>> grouped = new HashMap<>();
+        for (ThumbEvent evt : events) {
+            Pair<Long, Long> key = Pair.of(evt.getUserId(), evt.getQuestionId());
+            grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(evt);
         }
-
-        latestEvents.forEach((userQuestionPair, event) -> {
-            if (event == null) {
-                return;
+        grouped.forEach((userQuestionPair, evts) -> {
+            // 按时间排序
+            evts.sort(Comparator.comparing(ThumbEvent::getEventTime));
+            ThumbEvent last = evts.get(evts.size() - 1);
+            boolean hasDecr = evts.stream().anyMatch(e -> e.getType() == ThumbEvent.EventType.DECR);
+            if (hasDecr) {
+                needRemove.set(true);
+                wrapper.or()
+                    .eq(Thumb::getUserId, userQuestionPair.getLeft())
+                    .eq(Thumb::getQuestionId, userQuestionPair.getRight());
             }
-            ThumbEvent.EventType finalAction = event.getType();
-
-            if (finalAction == ThumbEvent.EventType.INCR) {
-                countMap.merge(event.getQuestionId(), 1L, Long::sum);
+            if (last.getType() == ThumbEvent.EventType.INCR) {
+                countMap.merge(userQuestionPair.getRight(), 1L, Long::sum);
                 Thumb thumb = new Thumb();
-                thumb.setQuestionId(event.getQuestionId());
-                thumb.setUserId(event.getUserId());
+                thumb.setQuestionId(userQuestionPair.getRight());
+                thumb.setUserId(userQuestionPair.getLeft());
                 thumbs.add(thumb);
             } else {
-                needRemove.set(true);
-                wrapper.or().eq(Thumb::getUserId, event.getUserId()).eq(Thumb::getQuestionId, event.getQuestionId());
-                countMap.merge(event.getQuestionId(), -1L, Long::sum);
+                // 最终为取消操作
+                countMap.merge(userQuestionPair.getRight(), -1L, Long::sum);
             }
         });
 
@@ -221,9 +230,20 @@ public class ThumbConsumer {
     }
 
     public void batchInsertThumbs(List<Thumb> thumbs) {
-        if (!thumbs.isEmpty()) {
+        if (thumbs.isEmpty()) {
+            return;
+        }
+        // 过滤掉数据库中已存在的(userId,questionId)组合，避免主键冲突
+        List<Thumb> toInsert = thumbs.stream()
+            .filter(t -> thumbService.count(
+                new LambdaQueryWrapper<Thumb>()
+                    .eq(Thumb::getUserId, t.getUserId())
+                    .eq(Thumb::getQuestionId, t.getQuestionId())
+            ) == 0)
+            .collect(Collectors.toList());
+        if (!toInsert.isEmpty()) {
             // 分批次插入
-            thumbService.saveBatch(thumbs, 500);
+            thumbService.saveBatch(toInsert, 500);
         }
     }
 }

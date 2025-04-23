@@ -5,7 +5,7 @@ import axios from "axios";
 const DEV_BASE_URL = "http://localhost:8101";
 const PROD_BASE_URL = "http://8.138.107.13:8101";
 const myAxios = axios.create({
-  baseURL: PROD_BASE_URL,
+  baseURL: DEV_BASE_URL,
   timeout: 60000,
   withCredentials: true,
 });
@@ -28,14 +28,16 @@ myAxios.interceptors.response.use(
   function (response) {
     // 处理响应数据
     const { data } = response;
-    // 未登录
     if (data.code === 40100) {
-      // 不是获取用户信息接口，或者不是登录页面，则跳转到登录页面
-      if (
-        !response.request.responseURL.includes("user/get/login") &&
-        !window.location.pathname.includes("/user/login")
-      ) {
-        window.location.href = `/user/login?redirect=${window.location.href}`;
+      // 仅在浏览器环境中进行重定向
+      if (typeof window !== 'undefined') {
+        const responseURL = response.request?.responseURL || '';
+        if (
+          !responseURL.includes("user/get/login") &&
+          !window.location.pathname.includes("/user/login")
+        ) {
+          window.location.href = `/user/login?redirect=${window.location.href}`;
+        }
       }
     } else if (data.code !== 0) {
       // 其他错误

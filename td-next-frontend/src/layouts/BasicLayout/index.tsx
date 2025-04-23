@@ -87,7 +87,6 @@ export default function BasicLayout({ children }: Props) {
           shape: undefined,
           srcSet: "",
           style: undefined,
-          valueOf: undefined,
           src: loginUser.userAvatar || "/assets/OIP-C.jpg",
           size: "small",
           title: loginUser.userName || "土豆",

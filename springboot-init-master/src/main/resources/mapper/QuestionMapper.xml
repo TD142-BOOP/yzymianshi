@@ -15,13 +15,14 @@
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="thumbCount" column="thumbCount" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,title,content,
         tags,answer,userId,
         editTime,createTime,updateTime,
-        isDelete
+        isDelete,thumbCount
     </sql>
 
     <update id="batchUpdateThumbCount">

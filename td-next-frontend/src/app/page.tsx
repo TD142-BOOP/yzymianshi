@@ -23,7 +23,7 @@ export default async function HomePage() {
       sortField: "createTime",
       sortOrder: "descend",
     });
-    questionBankList = res.data.records ?? [];
+    questionBankList = res.data?.records ?? [];
   } catch (e) {
     console.error("获取题库列表失败，" + e.message);
   }
@@ -34,7 +34,7 @@ export default async function HomePage() {
       sortField: "createTime",
       sortOrder: "descend",
     });
-    questionList = res.data.records ?? [];
+    questionList = res.data?.records ?? [];
   } catch (e) {
     console.error("获取题目列表失败，" + e.message);
   }
