@@ -10,6 +10,7 @@ import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.redisson.api.RedissonClient;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,9 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 本地计数管理器——使用 Pulsar 事件驱动将过期的计数同步到 Redis
@@ -31,6 +35,9 @@ public class CounterManager {
     private PulsarClient   pulsarClient;
 
     private Producer<CounterEvent> counterProducer;
+
+    // 跟踪需要批量刷新的 key
+    private final Set<String> dirtyKeys = ConcurrentHashMap.newKeySet();
 
     public static final String LUA_SCRIPT =
             "local exists = redis.call('exists', KEYS[1])\n" +
@@ -75,11 +82,10 @@ public class CounterManager {
         String redisKey = generateRedisKey(key, timeInterval, timeUnit);
         // 更新本地缓存中的计数
         counterCache.asMap().compute(redisKey, (k, v) -> v == null ? 1 : v + 1);
-        // 写入缓存后立即发送 Pulsar 同步事件
-        Integer newValue = counterCache.getIfPresent(redisKey);
-        counterProducer.sendAsync(new CounterEvent(redisKey, newValue))
-            .exceptionally(ex -> { log.error("发送计数事件失败 key={} value={}", redisKey, newValue, ex); return null; });
+        // 标记为脏数据，待定时刷新
+        dirtyKeys.add(redisKey);
         // 优先读取本地缓存
+        Integer newValue = counterCache.getIfPresent(redisKey);
         if (newValue != null) {
             return newValue.longValue();
         }
@@ -117,6 +123,27 @@ public class CounterManager {
             } catch (PulsarClientException e) {
                 log.error("关闭 CounterEvent 生产者失败", e);
             }
+        }
+    }
+
+    // 新增：每5秒批量同步计数到 Redis
+    @Scheduled(fixedRate = 5000)
+    public void flushCounterEvents() {
+        if (dirtyKeys.isEmpty()) {
+            return;
+        }
+        // 批量发送脏数据，并移除标记
+        Set<String> keysToFlush = new HashSet<>(dirtyKeys);
+        for (String k : keysToFlush) {
+            Integer v = counterCache.getIfPresent(k);
+            if (v != null) {
+                counterProducer.sendAsync(new CounterEvent(k, v))
+                    .exceptionally(ex -> {
+                        log.error("定时发送计数事件失败 key={} value={}", k, v, ex);
+                        return null;
+                    });
+            }
+            dirtyKeys.remove(k);
         }
     }
 }
