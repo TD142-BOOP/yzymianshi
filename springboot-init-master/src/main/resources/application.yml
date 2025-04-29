@@ -185,7 +185,7 @@ sa-token:
   is-log: true
 
 ai:
-  apiKey: a4eb4678-bafb-46cb-bde7-7e03f263af64
+  apiKey: xxx
 
 # Pulsar配置
 pulsar:
