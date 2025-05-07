@@ -3,6 +3,7 @@ package com.tudou.tudoumianshi.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tudou.tudoumianshi.constant.RedisLuaScriptConstant;
 import com.tudou.tudoumianshi.listener.thumb.ThumbEvent;
+import com.tudou.tudoumianshi.manager.cache.ThumbCacheManager;
 import com.tudou.tudoumianshi.mapper.ThumbMapper;
 import com.tudou.tudoumianshi.model.dto.thumb.DoThumbRequest;
 import com.tudou.tudoumianshi.model.entity.Thumb;
@@ -15,30 +16,32 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.PulsarClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 @Service("thumbService")
 @Slf4j
 public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb>
         implements ThumbService {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
-    @Autowired
+    @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired(required = false)
+    @Resource
+    private ThumbCacheManager thumbCacheManager;
+
+    @Resource
     private PulsarClient pulsarClient;
 
     private Producer<byte[]> thumbProducer;
@@ -87,6 +90,12 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb>
         final Long questionId = doThumbRequest.getQuestionId();
         String userThumbKey = RedisKeyUtil.getUserThumbKey(loginUserId);
 
+        // 本地缓存检查幂等：若已点赞，直接抛错
+        Boolean localHas = thumbCacheManager.hasThumbInCache(questionId, loginUserId);
+        if (Boolean.TRUE.equals(localHas)) {
+            throw new RuntimeException("用户已点赞");
+        }
+
         // 明确List的类型以避免类型推断问题
         List<String> keys = new ArrayList<String>();
         keys.add(userThumbKey);
@@ -100,6 +109,9 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb>
         if (LuaStatusEnum.FAIL.getValue() == result) {
             throw new RuntimeException("用户已点赞");
         }
+
+        // 操作成功后更新本地缓存
+        thumbCacheManager.updateThumbCache(questionId, loginUserId, true);
 
         // 使用传统方式创建ThumbEvent对象，避免使用构建器模式
         final ThumbEvent thumbEvent = new ThumbEvent();
@@ -165,6 +177,9 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb>
             throw new RuntimeException("用户未点赞");
         }
 
+        // 操作成功后更新本地缓存
+        thumbCacheManager.updateThumbCache(questionId, loginUserId, false);
+
         // 使用传统方式创建ThumbEvent对象，避免使用构建器模式
         final ThumbEvent thumbEvent = new ThumbEvent();
         thumbEvent.setQuestionId(questionId);
@@ -221,6 +236,22 @@ public class ThumbServiceMQImpl extends ServiceImpl<ThumbMapper, Thumb>
 
     @Override
     public Boolean hasThumb(Long questionId, Long userId) {
-        return redisTemplate.opsForHash().hasKey(RedisKeyUtil.getUserThumbKey(userId), questionId.toString());
+        // 1. 优先从本地缓存判断
+        Boolean cached = thumbCacheManager.hasThumbInCache(questionId, userId);
+        if (cached != null) {
+            return cached;
+        }
+        // 2. 本地缓存未命中，尝试加载热点点赞数据
+        thumbCacheManager.cacheThumbRelations(questionId);
+        cached = thumbCacheManager.hasThumbInCache(questionId, userId);
+        if (cached != null) {
+            return cached;
+        }
+        // 3. 回退到 Redis
+        boolean has = redisTemplate.opsForHash()
+                .hasKey(RedisKeyUtil.getUserThumbKey(userId), questionId.toString());
+        // 4. 更新本地缓存（如果已加载热点缓存）
+        thumbCacheManager.updateThumbCache(questionId, userId, has);
+        return has;
     }
 }

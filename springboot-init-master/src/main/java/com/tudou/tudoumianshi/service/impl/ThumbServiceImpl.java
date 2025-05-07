@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -30,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * 点赞记录表服务实现
  *
  */
-@Service("thumbServiceLocalCache")
+//@Service("thumbServiceLocalCache")
 @Slf4j
 @RequiredArgsConstructor
 public class ThumbServiceImpl extends ServiceImpl<ThumbMapper, Thumb> implements ThumbService {

@@ -50,7 +50,7 @@ public class CounterManager {
 
     // 本地缓存，过期时通过 Pulsar 事件发送同步命令
     private final Cache<String, Integer> counterCache = Caffeine.newBuilder()
-            .expireAfterWrite(80, TimeUnit.SECONDS)
+            .expireAfterWrite(60, TimeUnit.SECONDS)
             .removalListener((key, value, cause) -> {
                 if (cause.wasEvicted() || cause == RemovalCause.EXPLICIT) {
                     counterProducer.sendAsync(new CounterEvent((String) key, (Integer) value))

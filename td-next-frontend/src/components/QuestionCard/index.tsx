@@ -25,7 +25,7 @@ const QuestionCard = (props: Props) => {
   // 签到
   useAddUserSignInRecord();
 
-  // 点赞状态
+  // 状态
   const [thumbCount, setThumbCount] = useState(question.thumbCount ?? 0);
   const [hasThumb, setHasThumb] = useState(question.hasThumb ?? false);
 

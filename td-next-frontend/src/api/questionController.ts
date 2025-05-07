@@ -17,9 +17,9 @@ export async function addQuestionUsingPost(
   });
 }
 
-/** aiGenerateQuestions POST /api/question/ai/generate/question */
-export async function aiGenerateQuestionsUsingPost(
-  body: API.QuestionAIGenerateRequest,
+/** generateQuestions POST /api/question/ai/generate/question */
+export async function generateQuestionsUsingPost(
+  body: API.QuestionGenerateRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/question/ai/generate/question', {

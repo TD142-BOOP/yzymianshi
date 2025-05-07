@@ -32,17 +32,17 @@ public class PulsarConfig {
     @Bean
     public PulsarClient pulsarClient() throws PulsarClientException {
         log.info("初始化PulsarClient: serviceUrl={}", serviceUrl);
-        
+
         pulsarClient = PulsarClient.builder()
                 .serviceUrl(serviceUrl)
                 .ioThreads(ioThreads)
                 .listenerThreads(listenerThreads)
                 .enableTcpNoDelay(enableTcpNoDelay)
                 .build();
-                
+
         return pulsarClient;
     }
-    
+
     @PreDestroy
     public void destroy() {
         if (pulsarClient != null) {
@@ -54,4 +54,4 @@ public class PulsarConfig {
             }
         }
     }
-} 
+}

@@ -1,5 +1,6 @@
+// @ts-ignore
+/* eslint-disable */
 import request from '@/libs/request';
-
 
 /** addMockInterview POST /api/mockInterview/add */
 export async function addMockInterviewUsingPost(

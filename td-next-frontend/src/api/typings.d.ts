@@ -5,12 +5,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseInt_ = {
-    code?: number;
-    data?: number;
-    message?: string;
-  };
-
   type BaseResponseListInt_ = {
     code?: number;
     data?: number[];
@@ -38,18 +32,6 @@ declare namespace API {
   type BaseResponsePageMockInterview_ = {
     code?: number;
     data?: PageMockInterview_;
-    message?: string;
-  };
-
-  type BaseResponsePagePost_ = {
-    code?: number;
-    data?: PagePost_;
-    message?: string;
-  };
-
-  type BaseResponsePagePostVO_ = {
-    code?: number;
-    data?: PagePostVO_;
     message?: string;
   };
 
@@ -101,12 +83,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePostVO_ = {
-    code?: number;
-    data?: PostVO;
-    message?: string;
-  };
-
   type BaseResponseQuestionBankQuestionVO_ = {
     code?: number;
     data?: QuestionBankQuestionVO;
@@ -143,62 +119,15 @@ declare namespace API {
     message?: string;
   };
 
-  type checkUsingGETParams = {
-    /** echostr */
-    echostr?: string;
-    /** nonce */
-    nonce?: string;
-    /** signature */
-    signature?: string;
-    /** timestamp */
-    timestamp?: string;
-  };
-
   type DeleteRequest = {
     id?: number;
   };
 
-  type doLoginUsingDELETEParams = {
-    /** password */
-    password?: string;
-    /** username */
-    username?: string;
-  };
-
-  type doLoginUsingGETParams = {
-    /** password */
-    password?: string;
-    /** username */
-    username?: string;
-  };
-
-  type doLoginUsingPATCHParams = {
-    /** password */
-    password?: string;
-    /** username */
-    username?: string;
-  };
-
-  type doLoginUsingPOSTParams = {
-    /** password */
-    password?: string;
-    /** username */
-    username?: string;
-  };
-
-  type doLoginUsingPUTParams = {
-    /** password */
-    password?: string;
-    /** username */
-    username?: string;
+  type DoThumbRequest = {
+    questionId?: number;
   };
 
   type getMockInterviewByIdUsingGETParams = {
-    /** id */
-    id?: number;
-  };
-
-  type getPostVOByIdUsingGETParams = {
     /** id */
     id?: number;
   };
@@ -209,6 +138,7 @@ declare namespace API {
   };
 
   type getQuestionBankVOByIdUsingGETParams = {
+    content?: string;
     current?: number;
     description?: string;
     id?: number;
@@ -309,32 +239,6 @@ declare namespace API {
     orders?: OrderItem[];
     pages?: number;
     records?: MockInterview[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
-  type PagePost_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: Post[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
-  type PagePostVO_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: PostVO[];
     searchCount?: boolean;
     size?: number;
     total?: number;
@@ -444,87 +348,6 @@ declare namespace API {
     total?: number;
   };
 
-  type Post = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    id?: number;
-    isDelete?: number;
-    tags?: string;
-    thumbCount?: number;
-    title?: string;
-    updateTime?: string;
-    userId?: number;
-  };
-
-  type PostAddRequest = {
-    content?: string;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostEditRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostFavourAddRequest = {
-    postId?: number;
-  };
-
-  type PostFavourQueryRequest = {
-    current?: number;
-    pageSize?: number;
-    postQueryRequest?: PostQueryRequest;
-    sortField?: string;
-    sortOrder?: string;
-    userId?: number;
-  };
-
-  type PostQueryRequest = {
-    content?: string;
-    current?: number;
-    favourUserId?: number;
-    id?: number;
-    notId?: number;
-    orTags?: string[];
-    pageSize?: number;
-    searchText?: string;
-    sortField?: string;
-    sortOrder?: string;
-    tags?: string[];
-    title?: string;
-    userId?: number;
-  };
-
-  type PostThumbAddRequest = {
-    postId?: number;
-  };
-
-  type PostUpdateRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostVO = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    hasFavour?: boolean;
-    hasThumb?: boolean;
-    id?: number;
-    tagList?: string[];
-    thumbCount?: number;
-    title?: string;
-    updateTime?: string;
-    user?: UserVO;
-    userId?: number;
-  };
-
   type Question = {
     answer?: string;
     content?: string;
@@ -533,6 +356,7 @@ declare namespace API {
     id?: number;
     isDelete?: number;
     tags?: string;
+    thumbCount?: number;
     title?: string;
     updateTime?: string;
     userId?: number;
@@ -543,11 +367,6 @@ declare namespace API {
     content?: string;
     tags?: string[];
     title?: string;
-  };
-
-  type QuestionAIGenerateRequest = {
-    number?: number;
-    questionType?: string;
   };
 
   type QuestionBank = {
@@ -576,6 +395,7 @@ declare namespace API {
   };
 
   type QuestionBankQueryRequest = {
+    content?: string;
     current?: number;
     description?: string;
     id?: number;
@@ -605,11 +425,6 @@ declare namespace API {
   };
 
   type QuestionBankQuestionBatchAddRequest = {
-    questionBankId?: number;
-    questionIdList?: number[];
-  };
-
-  type QuestionBankQuestionBatchRemoveRequest = {
     questionBankId?: number;
     questionIdList?: number[];
   };
@@ -679,6 +494,11 @@ declare namespace API {
     title?: string;
   };
 
+  type QuestionGenerateRequest = {
+    questionNum?: number;
+    questionType?: string;
+  };
+
   type QuestionQueryRequest = {
     answer?: string;
     content?: string;
@@ -707,16 +527,14 @@ declare namespace API {
     answer?: string;
     content?: string;
     createTime?: string;
+    hasThumb?: boolean;
     id?: number;
     tagList?: string[];
+    thumbCount?: number;
     title?: string;
     updateTime?: string;
     user?: UserVO;
     userId?: number;
-  };
-
-  type uploadFileUsingPOSTParams = {
-    biz?: string;
   };
 
   type User = {
@@ -756,11 +574,6 @@ declare namespace API {
     userName?: string;
     userProfile?: string;
     workExperience?: string;
-  };
-
-  type userLoginByWxOpenUsingGETParams = {
-    /** code */
-    code: string;
   };
 
   type UserLoginRequest = {
