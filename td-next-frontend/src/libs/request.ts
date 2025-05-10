@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 创建 Axios 实例
 // 区分开发和生产环境
-const DEV_BASE_URL = "http://localhost:8101";
+const DEV_BASE_URL = "http://1a1c6c95.r5.cpolar.top";
 const PROD_BASE_URL = "http://user.kokodayo.cyou:8101";
 const myAxios = axios.create({
   baseURL: DEV_BASE_URL,

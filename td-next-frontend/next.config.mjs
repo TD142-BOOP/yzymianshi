@@ -1,4 +1,3 @@
-
 /** @type {import("next").NextConfig} */
 const nextConfig = {
     output: "standalone",
@@ -9,7 +8,15 @@ const nextConfig = {
         // !! WARN !!
         ignoreBuildErrors: true
     },
-    reactStrictMode: false // 禁用 React 严格模式
+    reactStrictMode: false, // 禁用 React 严格模式
+    async rewrites() {
+        return [
+            {
+                source: '/api/:path*',
+                destination: 'http://localhost:8101/api/:path*' // 替换为你的后端服务地址
+            }
+        ];
+    }
 };
 
 export default nextConfig;
