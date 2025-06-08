@@ -144,3 +144,6 @@ Sa-Token
 用HotKey和Sentinel统计用户访问接口次数，达到配置的阈值将用户ip更新到nacos配置
 
 用注解的方式实现反爬虫，热点key检测的功能
+
+![{04C343D3-2820-4E57-A7B7-7BAB89C1B8B9}](https://github.com/user-attachments/assets/6f170852-4bc3-40d8-a3bc-2eb45d00a071)
+
