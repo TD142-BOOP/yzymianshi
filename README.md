@@ -43,3 +43,5 @@
 - 布隆过滤器（`BlackIpFilter`）
 - 热点Key检测（`HotKeyAspect`）
 - 分布式锁（`DistributedLockAspect`）
+  <img width="951" height="792" alt="{CC399C1F-5DC0-461D-8876-0F8164F700DF}" src="https://github.com/user-attachments/assets/807e46b7-a840-4a63-93af-fec6c0e8dd8f" />
+
