@@ -42,6 +42,7 @@ create table user
 create index idx_unionId
     on user (unionId);
 -- 题库表
+-- auto-generated definition
 create table question
 (
     id         bigint auto_increment comment 'id'
@@ -54,7 +55,8 @@ create table question
     editTime   datetime default CURRENT_TIMESTAMP not null comment '编辑时间',
     createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0                 not null comment '是否删除'
+    isDelete   tinyint  default 0                 not null comment '是否删除',
+    thumbCount int      default 0                 not null comment '点赞数'
 )
     comment '题目' collate = utf8mb4_unicode_ci;
 
@@ -63,6 +65,8 @@ create index idx_title
 
 create index idx_userId
     on question (userId);
+
+
 
 
 -- 题目表
@@ -115,3 +119,17 @@ create table if not exists mock_interview
     isDelete       tinyint  default 0                 not null comment '是否删除（逻辑删除）',
     index idx_userId (userId)
     ) comment '模拟面试' collate = utf8mb4_unicode_ci;
+
+
+-- auto-generated definition
+create table thumb
+(
+    id         bigint auto_increment
+        primary key,
+    userId     bigint                             not null,
+    questionId bigint                             not null,
+    createTime datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    constraint idx_userId_questionId
+        unique (userId, questionId)
+);
+

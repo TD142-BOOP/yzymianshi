@@ -34,7 +34,7 @@ import static com.tudou.tudoumianshi.service.impl.UserServiceImpl.SALT;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:8101", allowCredentials = "true")
+@CrossOrigin(origins = "http://15cf7e0f.r5.cpolar.top", allowCredentials = "true")
 @Slf4j
 public class UserController {
 

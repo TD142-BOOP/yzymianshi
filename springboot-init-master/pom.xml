@@ -58,7 +58,30 @@
             <artifactId>pulsar-client</artifactId>
             <version>2.11.0</version> <!-- 支持 JDK 8 的最新稳定版 -->
         </dependency>
+        <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+            <version>1.39.0</version>
+        </dependency>
 
+        <!-- 提供Redis连接池 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+
+        <!-- 整合 Prometheus + Grafana -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>2.7.2</version> <!-- 与Spring Boot主版本一致 -->
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.9.2</version> <!-- 匹配Micrometer版本 -->
+        </dependency>
 
         <!--  druid  -->
         <dependency>
@@ -94,10 +117,10 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/hotkey-client-0.0.4-SNAPSHOT.jar</systemPath>
         </dependency>
-        <!--  https://doc.xiaominfo.com/docs/quick-start#openapi2  -->
+        <!--  Use Knife4j OpenAPI3 starter instead of Swagger2 -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
+            <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
             <version>4.4.0</version>
         </dependency>
         <!--elsaticsearch的客户端-->
@@ -176,6 +199,12 @@
        <artifactId>spring-boot-starter-test</artifactId>
        <scope>test</scope>
    </dependency>
+        <!-- Add swagger-annotations for RequiredMode -->
+        <dependency>
+          <groupId>io.swagger.core.v3</groupId>
+          <artifactId>swagger-annotations</artifactId>
+          <version>2.2.9</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

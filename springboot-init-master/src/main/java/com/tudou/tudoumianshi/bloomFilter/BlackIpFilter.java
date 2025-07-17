@@ -3,6 +3,7 @@ package com.tudou.tudoumianshi.bloomFilter;
 import com.tudou.tudoumianshi.utils.NetUtils;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
  *
  */
 
-//@WebFilter(urlPatterns = "/*", filterName = "blackIpFilter")
+@WebFilter(urlPatterns = "/*", filterName = "blackIpFilter")
 public class BlackIpFilter implements Filter {
 
     @Override

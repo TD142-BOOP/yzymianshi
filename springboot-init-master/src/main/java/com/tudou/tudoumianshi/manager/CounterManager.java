@@ -48,18 +48,9 @@ public class CounterManager {
                     "end\n" +
                     "return ARGV[1]";
 
-    // 本地缓存，过期时通过 Pulsar 事件发送同步命令
+    // 本地缓存
     private final Cache<String, Integer> counterCache = Caffeine.newBuilder()
             .expireAfterWrite(60, TimeUnit.SECONDS)
-            .removalListener((key, value, cause) -> {
-                if (cause.wasEvicted() || cause == RemovalCause.EXPLICIT) {
-                    counterProducer.sendAsync(new CounterEvent((String) key, (Integer) value))
-                            .exceptionally(ex -> {
-                                log.error("发送计数事件失败 key={} value={}", key, value, ex);
-                                return null;
-                            });
-                }
-            })
             .build();
 
     public long incrAndGetCounter(String key) {

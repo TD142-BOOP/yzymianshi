@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// 创建 Axios 实例
-// 区分开发和生产环境
-const DEV_BASE_URL = "http://1a1c6c95.r5.cpolar.top";
-const PROD_BASE_URL = "http://user.kokodayo.cyou:8101";
+// Determine baseURL: server uses local backend, client uses Next.js proxy
+const isServer = typeof window === 'undefined';
 const myAxios = axios.create({
-  baseURL: DEV_BASE_URL,
+  baseURL: isServer ? 'http://localhost:8101' : '',
   timeout: 60000,
   withCredentials: true,
 });
