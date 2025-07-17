@@ -1,7 +1,7 @@
 # Spring Boot初始化项目
 
 ## 项目简介
-一个基于Spring Boot的现代化企业级脚手架，集成主流技术栈（Redis/Elasticsearch/Pulsar等），提供开箱即用的：
+一个基于Spring Boot的脚手架，集成主流技术栈（Redis/Elasticsearch/Pulsar等），提供开箱即用的：
 - **用户权限管理**（Sa-Token）
 - **题库与面试系统**（ES全文检索）
 - **高性能点赞服务**（异步消息队列）
